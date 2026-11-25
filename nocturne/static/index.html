@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="nocturne-token" content="{{NOCTURNE_TOKEN}}">
+  <meta name="nocturne-version" content="{{NOCTURNE_VERSION}}">
+  <title>Nocturne Codex</title>
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/nocturne.css">
+  <script type="module" src="/static/js/main.js"></script>
+</head>
+<body class="is-loading">
+  <canvas id="sky" class="sky" aria-hidden="true"></canvas>
+  <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="crownbar">
+    <div class="candle candle--left" aria-hidden="true"><span class="flame"></span></div>
+    <div class="crownbar__crest" id="day-crest"></div>
+    <div class="crownbar__title">
+      <h1 id="codex-title">Nocturne Codex</h1>
+      <p class="crownbar__omen" id="omen-line"></p>
+    </div>
+    <nav class="crownbar__nav" aria-label="Nights and tools">
+      <button class="icon-btn" id="prev-day" title="Previous night (←)" aria-label="Previous night">‹</button>
+      <button class="daylabel" id="day-label" title="Open the archive of nights"></button>
+      <button class="icon-btn" id="next-day" title="Next night (→)" aria-label="Next night">›</button>
+      <button class="btn btn--small" id="today-btn" hidden>Tonight</button>
+      <button class="icon-btn" id="sound-toggle" title="Sound (M)" aria-label="Toggle sound">♫</button>
+      <button class="icon-btn icon-btn--tome" id="tome-toggle" title="The Tome (T)" aria-label="Open the Tome">❦</button>
+    </nav>
+    <div class="candle candle--right" aria-hidden="true"><span class="flame"></span></div>
+  </header>
+
+  <main class="sanctum" id="sanctum">
+    <aside class="panel altar" id="altar" aria-label="The Altar">
+      <h2 class="panel__title">The Altar</h2>
+      <div class="spread" id="spread"></div>
+      <h3 class="panel__subtitle">Edicts of the Night</h3>
+      <ol class="edicts" id="edicts"></ol>
+      <div class="house" id="house"></div>
+    </aside>
+
+    <section class="board" id="board" aria-label="The Sanctum board">
+      <div class="board__frame" aria-hidden="true"></div>
+      <div class="board__notes" id="board-notes"></div>
+      <p class="board__empty" id="board-empty" hidden></p>
+    </section>
+
+    <aside class="panel quill" id="quill" aria-label="The Quill">
+      <h2 class="panel__title">The Quill</h2>
+      <div class="quill__form" id="quill-body">
+        <input id="note-title" class="quill__title" maxlength="120" placeholder="Title of the entry" autocomplete="off" spellcheck="true">
+        <textarea id="note-body" class="quill__body" placeholder="Write what the night tells you… Weave sigils from below, or type a shortcode such as :sol: or :luna:" spellcheck="true"></textarea>
+        <div class="quill__meters" id="quill-meters" aria-live="polite"></div>
+        <div class="sigil-palette" id="sigil-palette" role="toolbar" aria-label="Sigils"></div>
+        <div class="quill__footer">
+          <div class="omen-candle" id="omen-candle" title="The omen candle flares when a rite stirs"><span></span><span></span><span></span></div>
+          <div class="velocity" id="velocity" hidden title="Velocity"><span></span></div>
+          <button class="btn btn--ghost" id="clear-note" type="button">Clear</button>
+          <button class="btn btn--ghost" id="cancel-edit" type="button" hidden>Cancel edit</button>
+          <button class="btn btn--primary" id="inscribe" type="button">Inscribe <kbd>Ctrl ↵</kbd></button>
+        </div>
+      </div>
+      <div class="quill__sealed" id="quill-sealed" hidden></div>
+    </aside>
+  </main>
+
+  <aside class="tome" id="tome" aria-hidden="true" aria-label="The Tome">
+    <div class="tome__head">
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="rites">Rites</button>
+        <button role="tab" data-tab="sigils">Sigils</button>
+        <button role="tab" data-tab="archive">Archive</button>
+        <button role="tab" data-tab="houses">Houses</button>
+        <button role="tab" data-tab="deck">Deck</button>
+        <button role="tab" data-tab="settings">Settings</button>
+      </div>
+      <button class="icon-btn" id="tome-close" aria-label="Close the Tome">✕</button>
+    </div>
+    <div class="tome__body" id="tome-body"></div>
+  </aside>
+
+  <section class="ritual" id="ritual" hidden aria-label="The nightly draw"></section>
+
+  <section class="threshold" id="threshold" aria-label="Welcome">
+    <div class="threshold__window" aria-hidden="true"></div>
+    <div class="threshold__inner">
+      <div class="threshold__crest" id="threshold-crest">
+        <img src="/art/card/back.svg" alt="">
+      </div>
+      <h1 class="threshold__title">Nocturne Codex</h1>
+      <p class="threshold__date" id="threshold-date"></p>
+      <p class="threshold__line" id="threshold-line">Five cards are dealt each night. Keep three, burn two, and write beneath their edicts.</p>
+      <button class="btn btn--primary btn--large" id="enter" type="button">Light the Candle</button>
+      <p class="threshold__hint">Sound will play — press <kbd>M</kbd> to mute at any time.</p>
+    </div>
+  </section>
+
+  <canvas id="rite-canvas" class="rite-canvas" aria-hidden="true"></canvas>
+  <div id="rite-layer" class="rite-layer" aria-hidden="true"></div>
+  <div class="rite-banner" id="rite-banner" role="status" aria-live="polite"></div>
+  <div class="lantern-mask" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog class="scroll" id="note-dialog" aria-label="Note"></dialog>
+  <dialog class="scroll scroll--card" id="card-dialog" aria-label="Card"></dialog>
+</body>
+</html>
