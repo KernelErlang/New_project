@@ -243,6 +243,9 @@ export class Quill {
     } catch (err) {
       this.choir.play('error');
       toast(err.message, 'error');
+      if (err.code === 'ritual_required' || err.code === 'night_sealed') {
+        document.dispatchEvent(new CustomEvent('nocturne:stale'));
+      }
     } finally {
       this.busy = false;
       this.measure();

@@ -10,7 +10,7 @@ import { Quill } from './quill.js';
 import { Ritual } from './ritual.js';
 import { applyTheme } from './theme.js';
 import { cardDialogContent, Tome } from './tome.js';
-import { $, formatDay, h, hourName, shiftDay, shortDay, sleep, toast } from './util.js';
+import { $, formatDay, h, hourName, isoDay, shiftDay, shortDay, sleep, toast } from './util.js';
 
 const POSITIONS = ['crown', 'heart', 'shadow'];
 
@@ -87,9 +87,26 @@ const app = {
       document.documentElement.style.setProperty('--lx', `${event.clientX}px`);
       document.documentElement.style.setProperty('--ly', `${event.clientY}px`);
     });
+    setInterval(() => this.watchMidnight(), 30000);
+    document.addEventListener('nocturne:stale', () => this.watchMidnight(true));
     for (const id of ['note-dialog', 'card-dialog']) {
       const dialog = document.getElementById(id);
       dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+    }
+  },
+
+  /** When midnight passes with the Codex open, seal the old night and offer the new draw. */
+  async watchMidnight(force = false) {
+    if (!this.entered || !this.state || document.body.classList.contains('in-ritual')) return;
+    if (!force && isoDay(new Date()) === this.state.today) return;
+    try {
+      const state = await api.state();
+      if (state.today === this.state.today && !force) return;
+      toast('Midnight has passed. The old night is sealed; a new hand waits.', 'info', 7000);
+      this.setState(state);
+      if (state.ritual.status !== 'sealed') this.ritual.open(state);
+    } catch {
+      /* the Codex may have been closed; nothing to do */
     }
   },
 
